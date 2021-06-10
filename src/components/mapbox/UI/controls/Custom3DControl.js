@@ -22,16 +22,16 @@ class Custom3DControl {
       el.textContent = _text;
       switch(_text) {
         case '2D':
-          this.map.setPitch(45);
-          this.map.setBearing(-17.6);
+          this.map.setPitch(76);
+          this.map.setBearing(150);
           break;
         case '3D':
           this.map.setPitch(0);
           this.map.setBearing(0);
           break;
         default:
-          this.map.setPitch(45);
-          this.map.setBearing(-17.6);
+          this.map.setPitch(76);
+          this.map.setBearing(150);
       }
       e.stopPropagation()
     }, false)
