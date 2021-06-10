@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "name": "MyMapbox",
-=======
   "name": "MapBoxComponent",
->>>>>>> 75aed88c77791daaa085e788058c4de5868bfec3
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,16 +9,13 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
-<<<<<<< HEAD
     "element-ui": "^2.3.4",
     "map-promisified": "^0.4.0",
     "mapbox-gl": "^2.3.0",
-    "vue": "^2.6.11"
-=======
+    "vue": "^2.6.11",
     "mapbox-gl": "^2.3.0",
     "vue": "^2.6.11",
     "vue-mapbox": "^0.4.1"
->>>>>>> 75aed88c77791daaa085e788058c4de5868bfec3
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

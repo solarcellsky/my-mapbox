@@ -5,12 +5,8 @@ import GeolocateControl from "./UI/controls/GeolocateControl";
 import FullscreenControl from "./UI/controls/FullscreenControl";
 import AttributionControl from "./UI/controls/AttributionControl";
 import ScaleControl from "./UI/controls/ScaleControl";
-<<<<<<< HEAD
 import Custom3DControl from "./UI/controls/Custom3DControl";
 import MapStyleControl from "./UI/controls/MapStyleControl";
-
-=======
->>>>>>> 75aed88c77791daaa085e788058c4de5868bfec3
 import Marker from "./UI/Marker";
 import Popup from "./UI/Popup";
 
@@ -45,11 +41,8 @@ export const MglGeolocateControl = GeolocateControl;
 export const MglFullscreenControl = FullscreenControl;
 export const MglAttributionControl = AttributionControl;
 export const MglScaleControl = ScaleControl;
-<<<<<<< HEAD
 export const MglCustom3DControl = Custom3DControl;
 export const MglMapStyleControl = MapStyleControl;
-=======
->>>>>>> 75aed88c77791daaa085e788058c4de5868bfec3
 
 export const MglGeojsonLayer = GeojsonLayer;
 export const MglImageLayer = ImageLayer;
