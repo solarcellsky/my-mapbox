@@ -39,7 +39,6 @@
 <script>
 import "mapbox-gl/dist/mapbox-gl.css";
 import Mapbox from "mapbox-gl";
-
 const geoJson = {
      "type": "FeatureCollection",
      "features":
@@ -426,7 +425,6 @@ const geoJson = {
      ]
 }
 
-
 import {
   MglMap,
   MglGeolocateControl,
@@ -516,10 +514,9 @@ export default {
             coordinates: [
               [
                 [108.589595,34.34654],
-                [108.551143,34.189356],
                 [108.551143,34.119356],
                 [108.671306,34.134812],
-                [108.589595,34.34654],
+                [108.589595,34.34654]
               ],
             ],
           },
