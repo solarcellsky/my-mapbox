@@ -39,6 +39,18 @@
 <script>
 import "mapbox-gl/dist/mapbox-gl.css";
 import Mapbox from "mapbox-gl";
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
+import { 
+  RulerControl,
+  ZoomControl,
+  InspectControl
+} from 'mapbox-gl-controls';
+import 'mapbox-gl-controls/lib/controls.css';
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+
+
 const geoJson = {
      "type": "FeatureCollection",
      "features":
@@ -537,9 +549,6 @@ export default {
       window.$_map = obj.map;
       this.add3DBuildingLayer(window.$_map);
       this.addLines(window.$_map);
-      window.$_map.on('click', function(e) {
-        console.log(e.lngLat);
-      })
 
       let satelliteRaster = 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.webp?access_token=' + this.accessToken;
       this.addRasterTileLayer(window.$_map, satelliteRaster, 'satellite-raster', 'satellite-raster-layer');
@@ -547,6 +556,25 @@ export default {
       window.$_map.addControl(mapLanguage);
       this.addUrbanAreas(window.$_map);
 
+      let geocoder = new MapboxGeocoder({
+        accessToken: this.accessToken,
+        marker: {
+          color: '#ff0011'
+        },
+        country: 'CN',
+        language: 'zh-Hans',
+        mapboxgl: this.mapbox
+      });
+
+      let draw = new MapboxDraw();
+
+      window.$_map.addControl(geocoder, 'top-left');
+      window.$_map.addControl(new RulerControl(), 'top-right');
+      window.$_map.on('ruler.on', () => console.log('ruler: on'));
+      window.$_map.on('ruler.off', () => console.log('ruler: off'));
+      window.$_map.addControl(new ZoomControl(), 'top-right');
+      window.$_map.addControl(new InspectControl(), 'top-right');
+      window.$_map.addControl(draw, 'top-right');
     },
     addUrbanAreas(map) {
       let layers = map.getStyle().layers;
@@ -562,16 +590,15 @@ export default {
         'type': 'geojson',
         'data': 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_urban_areas.geojson'
       });
-      map.addLayer(
-        {
-          'id': 'urban-areas-fill',
-          'type': 'fill',
-          'source': 'urban-areas',
-          'layout': {},
-          'paint': {
-            'fill-color': '#f08',
-            'fill-opacity': 0.4
-          }
+      map.addLayer({
+        'id': 'urban-areas-fill',
+        'type': 'fill',
+        'source': 'urban-areas',
+        'layout': {},
+        'paint': {
+          'fill-color': '#f08',
+          'fill-opacity': 0.4
+        }
       // This is the important part of this example: the addLayer
       // method takes 2 arguments: the layer as an object, and a string
       // representing another layer's name. if the other layer
@@ -579,9 +606,7 @@ export default {
       // right before that layer in the stack, making it possible to put
       // 'overlays' anywhere in the layer stack.
       // Insert the layer beneath the first symbol layer.
-        },
-        firstSymbolId
-      );
+      }, firstSymbolId);
     },
     addRasterTileLayer(map, url, sourceId, layerId) {
       map.addSource(sourceId, {
@@ -706,5 +731,8 @@ export default {
 }
 .style-icon {
   width: 16px;
+}
+.mapboxgl-ctrl-geocoder--input:focus {
+  outline: 0;
 }
 </style>
