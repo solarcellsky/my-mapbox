@@ -438,6 +438,8 @@ import {
   MglGeojsonLayer
 } from "./mapbox";
 
+const mapLanguage = new window.MapboxLanguage({ defaultLanguage: "zh-Hans" });
+
 export default {
   name: "HelloWorld",
   components: {
@@ -463,7 +465,7 @@ export default {
       // mapbox://styles/mapbox/satellite-streets-v11
       // mapbox://styles/mapbox/traffic-day-v2
       // mapbox://styles/mapbox/traffic-night-v2
-      mapStyle: "mapbox://styles/mapbox/dark-v10", // your map style
+      mapStyle: "mapbox://styles/mapbox/streets-v11", // your map style
       coordinates: [
         [108.986133,34.275893]
       ],
@@ -535,6 +537,63 @@ export default {
       window.$_map = obj.map;
       this.add3DBuildingLayer(window.$_map);
       this.addLines(window.$_map);
+      window.$_map.on('click', function(e) {
+        console.log(e.lngLat);
+      })
+
+      let satelliteRaster = 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.webp?access_token=' + this.accessToken;
+      this.addRasterTileLayer(window.$_map, satelliteRaster, 'satellite-raster', 'satellite-raster-layer');
+      window.$_map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
+      window.$_map.addControl(mapLanguage);
+      this.addUrbanAreas(window.$_map);
+
+    },
+    addUrbanAreas(map) {
+      let layers = map.getStyle().layers;
+      // Find the index of the first symbol layer in the map style
+      let firstSymbolId;
+      for (let i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol') {
+          firstSymbolId = layers[i].id;
+          break;
+        }
+      }
+      map.addSource('urban-areas', {
+        'type': 'geojson',
+        'data': 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_urban_areas.geojson'
+      });
+      map.addLayer(
+        {
+          'id': 'urban-areas-fill',
+          'type': 'fill',
+          'source': 'urban-areas',
+          'layout': {},
+          'paint': {
+            'fill-color': '#f08',
+            'fill-opacity': 0.4
+          }
+      // This is the important part of this example: the addLayer
+      // method takes 2 arguments: the layer as an object, and a string
+      // representing another layer's name. if the other layer
+      // exists in the stylesheet already, the new layer will be positioned
+      // right before that layer in the stack, making it possible to put
+      // 'overlays' anywhere in the layer stack.
+      // Insert the layer beneath the first symbol layer.
+        },
+        firstSymbolId
+      );
+    },
+    addRasterTileLayer(map, url, sourceId, layerId) {
+      map.addSource(sourceId, {
+        type: "raster",
+        tiles: [url],
+        tileSize: 256
+      });
+      map.addLayer({
+        id: layerId,
+        type: "raster",
+        source: sourceId
+      });
     },
     addLines(map) {
       map.addSource('line', {

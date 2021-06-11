@@ -30,13 +30,13 @@ class MapStyleControl {
       // mapbox://styles/mapbox/traffic-night-v2
       switch(_text) {
         case '普':
-          this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11');
+          this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'visible');
           break;
         case '卫':
-          this.map.setStyle('mapbox://styles/mapbox/streets-v11');
+          this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
           break;
         default:
-          this.map.setStyle('mapbox://styles/mapbox/satellite-streets-v11');
+          this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
       }
       e.stopPropagation()
     }, false)
