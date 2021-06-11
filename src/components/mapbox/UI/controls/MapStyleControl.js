@@ -16,27 +16,16 @@ class MapStyleControl {
   $_createButton(className) {
     const el = window.document.createElement('button')
     el.className = className;
-    el.textContent = '卫';
+    // el.textContent = '卫';
+    el.innerHTML = '<img src="../../../../assets/satellite.svg" class="style-icon" />';
     el.addEventListener('click', (e) => {
-      let _text = e.target.innerText == '普' ? '卫' : '普';
-      el.textContent = _text;
-      // Mapbox v8 styles:
-      // mapbox://styles/mapbox/streets-v11
-      // mapbox://styles/mapbox/outdoors-v11
-      // mapbox://styles/mapbox/dark-v10
-      // mapbox://styles/mapbox/light-v10
-      // mapbox://styles/mapbox/satellite-streets-v11
-      // mapbox://styles/mapbox/traffic-day-v2
-      // mapbox://styles/mapbox/traffic-night-v2
-      switch(_text) {
-        case '普':
-          this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'visible');
-          break;
-        case '卫':
-          this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
-          break;
-        default:
-          this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
+      let _satellite = (e.target.src).includes('satellite');
+      let _src = _satellite ? '../../../../assets/map.svg' : '../../../../assets/satellite.svg';
+      e.target.src = _src;
+      if (_satellite) {
+        this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'visible');
+      } else {
+        this.map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
       }
       e.stopPropagation()
     }, false)

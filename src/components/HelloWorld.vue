@@ -700,5 +700,11 @@ export default {
 }
 .control_button {
   font-weight: 700;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+.style-icon {
+  width: 16px;
 }
 </style>
