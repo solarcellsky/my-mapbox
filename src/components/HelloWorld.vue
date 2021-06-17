@@ -4,7 +4,7 @@
     :mapStyle="mapStyle"
     :attributionControl="false"
     :center="coordinates[0]"
-    :zoom="10"
+    :zoom="16"
     @load="mapLoaded"
   >
     <MglMarker :coordinates="coordinates[0]" color="#CC0000" />
@@ -15,30 +15,42 @@
     <MglMapStyleControl position="bottom-right" />
     <MglScaleControl position="bottom-left" />
 
-    <MglVideoLayer
-      sourceId="myvideosource"
-      :source="sources"
-      layerId="myLayer"
-      :layer="layer"
-    />
-    <MglGeojsonLayer 
-      sourceId="mypolyource"
-      :source="geoJsonSource"
-      layerId="myPolyLayer"
-      :layer="geoJsonLayer"
-    />
-    <MglGeojsonLayer 
-      sourceId="myoutlineource"
-      :source="geoJsonSource"
-      layerId="myoutLineLayer"
-      :layer="geoJsonOutlinelayer"
-    />
+    <el-drawer
+      :title="drawerTitle"
+      :visible.sync="drawer"
+      :append-to-body="false"
+      :modal-append-to-body="false"
+      direction="ltr"
+      custom-class="echarts-drawer"
+      @opened="drawerOpen"
+      size="100%">
+      <div class="drawer-content">
+        <el-row :gutter="0">
+          <el-col :span="12">
+            <div class="echarts-box" id="my-echarts"></div>
+          </el-col>
+          <el-col :span="12">
+            <div class="echarts-box" id="my-pie-echarts"></div>
+          </el-col>
+        </el-row>
+        <el-row :gutter="0">
+          <el-col :span="12">
+            <div class="echarts-box" id="my-line-echarts"></div>
+          </el-col>
+          <el-col :span="12">
+            <div class="echarts-box" id="my-stack-echarts"></div>
+          </el-col>
+        </el-row>
+        <model-gltf src="../assets/model/34M17/34M_17.gltf" backgroundColor="#0f0d2a"></model-gltf>
+      </div>
+    </el-drawer>
   </MglMap>
 </template>
 
 <script>
-import "mapbox-gl/dist/mapbox-gl.css";
 import Mapbox from "mapbox-gl";
+import * as echarts from 'echarts';
+// import * as THREE from 'three';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { 
@@ -48,394 +60,14 @@ import {
 } from 'mapbox-gl-controls';
 import 'mapbox-gl-controls/lib/controls.css';
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import { ModelGltf } from 'vue-3d-model';
+import { Threebox } from 'threebox-plugin';
+import "mapbox-gl/dist/mapbox-gl.css";
+import 'threebox-plugin/dist/threebox.css';
 
+// const map3dstyle = require('./mapbox/map/map3dstyle.json');
 
-const geoJson = {
-     "type": "FeatureCollection",
-     "features":
-     [
-          {
-               "type": "Feature",
-               "properties": {},
-               "geometry": {
-                    "type": "LineString",
-                    "coordinates":
-                    [
-                         [6.56674, 45.39881],
-                         [6.56682, 45.399],
-                         [6.56701, 45.39959],
-                         [6.56727, 45.40006],
-                         [6.56738, 45.4003],
-                         [6.56745, 45.40041],
-                         [6.56757, 45.40053],
-                         [6.56799, 45.40082],
-                         [6.56809, 45.40095],
-                         [6.56811, 45.40109],
-                         [6.5681, 45.40119],
-                         [6.56801, 45.40154],
-                         [6.56801, 45.40163],
-                         [6.56804, 45.40176],
-                         [6.5681, 45.40191],
-                         [6.56833, 45.40233],
-                         [6.56863, 45.40269],
-                         [6.56869, 45.40277],
-                         [6.56873, 45.40287],
-                         [6.56873, 45.40333],
-                         [6.56871, 45.40349],
-                         [6.56872, 45.40354],
-                         [6.56882, 45.40362],
-                         [6.56897, 45.40366],
-                         [6.56914, 45.4036],
-                         [6.56927, 45.40346],
-                         [6.56942, 45.40304],
-                         [6.56945, 45.40286],
-                         [6.56945, 45.40268],
-                         [6.56937, 45.40223],
-                         [6.56936, 45.4019],
-                         [6.56938, 45.40181],
-                         [6.56945, 45.4017],
-                         [6.56956, 45.40157],
-                         [6.56996, 45.40131],
-                         [6.57004, 45.40123],
-                         [6.57012, 45.40109],
-                         [6.57014, 45.40102],
-                         [6.57013, 45.40093],
-                         [6.57005, 45.40069],
-                         [6.56985, 45.40036],
-                         [6.56988, 45.40027],
-                         [6.56992, 45.40025],
-                         [6.57009, 45.40027],
-                         [6.57067, 45.40069],
-                         [6.57076, 45.4008],
-                         [6.57096, 45.40124],
-                         [6.57102, 45.40133],
-                         [6.57113, 45.40141],
-                         [6.57151, 45.40157],
-                         [6.57169, 45.40168],
-                         [6.572, 45.40199],
-                         [6.57206, 45.40201],
-                         [6.57212, 45.40201],
-                         [6.57218, 45.402],
-                         [6.57223, 45.40192],
-                         [6.57222, 45.40185],
-                         [6.57212, 45.40165],
-                         [6.57215, 45.40135],
-                         [6.57214, 45.40124],
-                         [6.57205, 45.40112],
-                         [6.57178, 45.40097],
-                         [6.57169, 45.40088],
-                         [6.57164, 45.4008],
-                         [6.57163, 45.40063],
-                         [6.57173, 45.40035],
-                         [6.57175, 45.40015],
-                         [6.57185, 45.40011],
-                         [6.57191, 45.40011],
-                         [6.57199, 45.40018],
-                         [6.57212, 45.40048],
-                         [6.57221, 45.40055],
-                         [6.57282, 45.40089],
-                         [6.57291, 45.40097],
-                         [6.57295, 45.40105],
-                         [6.57295, 45.40127],
-                         [6.57298, 45.4013],
-                         [6.57304, 45.40131],
-                         [6.57314, 45.40128],
-                         [6.57317, 45.40124],
-                         [6.57315, 45.40091],
-                         [6.57319, 45.40057],
-                         [6.57313, 45.40011],
-                         [6.57313, 45.39999],
-                         [6.5732, 45.39998],
-                         [6.57324, 45.39995],
-                         [6.57322, 45.39989],
-                         [6.57329, 45.39983],
-                         [6.57370000391, 45.3992800008],
-                         [6.57411, 45.39873],
-                         [6.57418, 45.39857],
-                         [6.57416, 45.39849],
-                         [6.57402, 45.39821],
-                         [6.57401, 45.39811],
-                         [6.57402, 45.39784],
-                         [6.574, 45.39776],
-                         [6.57383, 45.39753],
-                         [6.57381, 45.39746],
-                         [6.57382, 45.39739],
-                         [6.57387, 45.39733],
-                         [6.57397, 45.39728],
-                         [6.57465, 45.39726],
-                         [6.57483, 45.39727],
-                         [6.57488, 45.39729],
-                         [6.57502, 45.3974],
-                         [6.57516, 45.39769],
-                         [6.57533, 45.39764],
-                         [6.57535, 45.39758],
-                         [6.57526, 45.39739],
-                         [6.57523, 45.39724],
-                         [6.57522, 45.39675],
-                         [6.57496, 45.39656],
-                         [6.57494, 45.39651],
-                         [6.57482, 45.39645],
-                         [6.57474, 45.39625],
-                         [6.57478, 45.39613],
-                         [6.57495, 45.39591],
-                         [6.57501, 45.39588],
-                         [6.5752, 45.39581],
-                         [6.5756, 45.39559],
-                         [6.57574, 45.39554],
-                         [6.5759, 45.39551],
-                         [6.57598, 45.39552],
-                         [6.57644, 45.39581],
-                         [6.57656, 45.39592],
-                         [6.57669, 45.39609],
-                         [6.57672, 45.39618],
-                         [6.57674, 45.39632],
-                         [6.57669, 45.39649],
-                         [6.57667, 45.39662],
-                         [6.57669, 45.39679],
-                         [6.57673, 45.397],
-                         [6.57678, 45.39716],
-                         [6.57694, 45.39749],
-                         [6.577, 45.39772],
-                         [6.57698, 45.39786],
-                         [6.57691, 45.3981],
-                         [6.57683, 45.39824],
-                         [6.57639, 45.39878],
-                         [6.57628, 45.39895],
-                         [6.57619, 45.39914],
-                         [6.57617, 45.39921],
-                         [6.57618, 45.39945],
-                         [6.57614, 45.39966],
-                         [6.57593, 45.4],
-                         [6.5759, 45.40015],
-                         [6.57578, 45.40043],
-                         [6.57571, 45.40064],
-                         [6.57573, 45.40103],
-                         [6.57576, 45.40123],
-                         [6.57584, 45.40147],
-                         [6.57589, 45.40157],
-                         [6.57607, 45.40182],
-                         [6.57612, 45.40186],
-                         [6.57617, 45.40186],
-                         [6.57623, 45.4018],
-                         [6.57635, 45.40148],
-                         [6.57637, 45.40136],
-                         [6.57642, 45.40129],
-                         [6.57648, 45.40124],
-                         [6.57674, 45.40113],
-                         [6.57679, 45.40107],
-                         [6.57686, 45.40093],
-                         [6.57709, 45.40064],
-                         [6.57715, 45.40045],
-                         [6.57721, 45.40024],
-                         [6.57729, 45.40014],
-                         [6.57799, 45.39981],
-                         [6.57809, 45.39974],
-                         [6.5782, 45.39962],
-                         [6.57845, 45.39941],
-                         [6.57874, 45.39902],
-                         [6.57889, 45.39878],
-                         [6.57893, 45.39867],
-                         [6.57901, 45.39857],
-                         [6.57915, 45.39843],
-                         [6.5794, 45.39826],
-                         [6.57968, 45.3977],
-                         [6.57978, 45.39757],
-                         [6.57984, 45.39744],
-                         [6.57996, 45.39706],
-                         [6.58004, 45.39692],
-                         [6.58027, 45.39661],
-                         [6.58033, 45.39646],
-                         [6.58037, 45.3964],
-                         [6.58042, 45.39637],
-                         [6.58047, 45.39637],
-                         [6.5805, 45.3964],
-                         [6.58051, 45.39645],
-                         [6.58049, 45.39657],
-                         [6.58039, 45.39683],
-                         [6.58037500018, 45.397495],
-                         [6.58036, 45.39816],
-                         [6.5804, 45.39885],
-                         [6.58043, 45.39901],
-                         [6.58049, 45.3992],
-                         [6.58055, 45.39925],
-                         [6.58064, 45.39929],
-                         [6.58081, 45.39933],
-                         [6.58114, 45.39954],
-                         [6.58122, 45.39955],
-                         [6.58128, 45.39953],
-                         [6.58132, 45.39948],
-                         [6.58138, 45.39924],
-                         [6.58139, 45.3991],
-                         [6.58123, 45.39886],
-                         [6.58112, 45.39843],
-                         [6.58112, 45.39835],
-                         [6.58122, 45.39808],
-                         [6.5812, 45.3979],
-                         [6.58107, 45.39758],
-                         [6.58107, 45.3974],
-                         [6.58112, 45.3973],
-                         [6.5813, 45.39711],
-                         [6.58144, 45.39692],
-                         [6.58168, 45.39664],
-                         [6.58217, 45.39652],
-                         [6.58227, 45.39646],
-                         [6.58241, 45.39632],
-                         [6.58251, 45.39628],
-                         [6.5826, 45.39627],
-                         [6.58272, 45.3963],
-                         [6.58325, 45.39659],
-                         [6.58363, 45.39695],
-                         [6.58407, 45.39719],
-                         [6.58426, 45.39734],
-                         [6.58452, 45.39743],
-                         [6.58467, 45.39744],
-                         [6.58482, 45.39742],
-                         [6.58549000423, 45.3970900018],
-                         [6.58616, 45.39676],
-                         [6.58637, 45.39671],
-                         [6.58678, 45.39669],
-                         [6.58732, 45.39661],
-                         [6.58737, 45.39656],
-                         [6.58733, 45.39651],
-                         [6.58719, 45.39643],
-                         [6.58701, 45.39638],
-                         [6.58642, 45.39635],
-                         [6.5861, 45.39635],
-                         [6.58598, 45.39631],
-                         [6.58543, 45.3959],
-                         [6.58533, 45.39578],
-                         [6.58527, 45.39556],
-                         [6.58529, 45.39541],
-                         [6.58537, 45.39528],
-                         [6.5855, 45.39496],
-                         [6.58583, 45.39453],
-                         [6.58589, 45.39438],
-                         [6.58587, 45.39418],
-                         [6.5859, 45.39394],
-                         [6.58596, 45.39373],
-                         [6.58591, 45.39343],
-                         [6.58592, 45.39332],
-                         [6.58611, 45.39264],
-                         [6.58617, 45.39258],
-                         [6.58621, 45.39256],
-                         [6.58631, 45.39255],
-                         [6.58643, 45.39261],
-                         [6.58656, 45.3929],
-                         [6.58666, 45.39305],
-                         [6.58682, 45.39324],
-                         [6.58716, 45.39349],
-                         [6.58731, 45.39363],
-                         [6.58768, 45.39384],
-                         [6.58809, 45.39398],
-                         [6.58845, 45.39404],
-                         [6.58874, 45.39401],
-                         [6.58898, 45.39401],
-                         [6.5894, 45.39406],
-                         [6.58964, 45.39405],
-                         [6.5901, 45.394],
-                         [6.59026, 45.39395],
-                         [6.59039, 45.39386],
-                         [6.59043, 45.39381],
-                         [6.59046, 45.39373],
-                         [6.59045, 45.39365],
-                         [6.59034, 45.39352],
-                         [6.59005, 45.39335],
-                         [6.58969, 45.39324],
-                         [6.58954, 45.39315],
-                         [6.58943, 45.39303],
-                         [6.58914, 45.39243],
-                         [6.58898, 45.39218],
-                         [6.58882, 45.39161],
-                         [6.58866, 45.39135],
-                         [6.58833, 45.39091],
-                         [6.58827, 45.3908],
-                         [6.58834, 45.39074],
-                         [6.58843, 45.3907],
-                         [6.58884, 45.39062],
-                         [6.58895, 45.39063],
-                         [6.58902, 45.3906],
-                         [6.58913, 45.39051],
-                         [6.58916, 45.39042],
-                         [6.58917, 45.39026],
-                         [6.58911, 45.38985],
-                         [6.58909, 45.38928],
-                         [6.58912, 45.38902],
-                         [6.58914, 45.38899],
-                         [6.58919, 45.38898],
-                         [6.58939, 45.38904],
-                         [6.58947, 45.3891],
-                         [6.58955, 45.38919],
-                         [6.5896, 45.38942],
-                         [6.58967, 45.38949],
-                         [6.59016, 45.38967],
-                         [6.59057, 45.38974],
-                         [6.59068, 45.38978],
-                         [6.59081, 45.38986],
-                         [6.59111, 45.39019],
-                         [6.59131, 45.39036],
-                         [6.59184999661, 45.3907200013],
-                         [6.59239, 45.39108],
-                         [6.59307, 45.39139],
-                         [6.5933, 45.39153],
-                         [6.59386, 45.39195],
-                         [6.59406, 45.39217],
-                         [6.59422, 45.3925],
-                         [6.59445, 45.39262],
-                         [6.59472, 45.39261],
-                         [6.59506, 45.39263],
-                         [6.5956, 45.39281],
-                         [6.59573, 45.39288],
-                         [6.59578, 45.39296],
-                         [6.5958, 45.39303],
-                         [6.5958, 45.39316],
-                         [6.59575, 45.39326],
-                         [6.59575, 45.39336],
-                         [6.59587, 45.39365],
-                         [6.596, 45.39413],
-                         [6.59628, 45.39444],
-                         [6.59651499768, 45.3950050003],
-                         [6.59675, 45.39557],
-                         [6.59685, 45.39568],
-                         [6.59704, 45.39581],
-                         [6.59716, 45.3961],
-                         [6.59734, 45.3964],
-                         [6.59753, 45.39659],
-                         [6.5981, 45.39725],
-                         [6.59828, 45.39756],
-                         [6.59862, 45.39805],
-                         [6.59893, 45.39862],
-                         [6.59915, 45.39898],
-                         [6.5993, 45.39934],
-                         [6.59935, 45.39977],
-                         [6.5995, 45.40009],
-                         [6.59962, 45.40047],
-                         [6.59983, 45.40075],
-                         [6.59993, 45.40144],
-                         [6.59992, 45.40182],
-                         [6.60011, 45.40246],
-                         [6.6002, 45.40309],
-                         [6.6004, 45.40339],
-                         [6.60056, 45.40356],
-                         [6.60074, 45.40366],
-                         [6.60094, 45.40381],
-                         [6.60102, 45.40393],
-                         [6.60105, 45.40406],
-                         [6.60106, 45.40425],
-                         [6.60103, 45.40456],
-                         [6.60106, 45.40471],
-                         [6.60129, 45.40508],
-                         [6.60148, 45.40532],
-                         [6.6018, 45.40588],
-                         [6.60195, 45.40625],
-                         [6.60223, 45.40675],
-                         [6.60239, 45.40741],
-                         [6.6025, 45.40753]
-                    ]
-               }
-          }
-     ]
-}
 
 import {
   MglMap,
@@ -445,9 +77,7 @@ import {
   MglFullscreenControl,
   MglCustom3DControl,
   MglMapStyleControl,
-  MglMarker,
-  MglVideoLayer,
-  MglGeojsonLayer
+  MglMarker
 } from "./mapbox";
 
 const mapLanguage = new window.MapboxLanguage({ defaultLanguage: "zh-Hans" });
@@ -463,8 +93,7 @@ export default {
     MglCustom3DControl,
     MglMapStyleControl,
     MglMarker,
-    MglVideoLayer,
-    MglGeojsonLayer
+    ModelGltf
   },
   data() {
     return {
@@ -477,7 +106,11 @@ export default {
       // mapbox://styles/mapbox/satellite-streets-v11
       // mapbox://styles/mapbox/traffic-day-v2
       // mapbox://styles/mapbox/traffic-night-v2
-      mapStyle: "mapbox://styles/mapbox/streets-v11", // your map style
+      mapStyle: "mapbox://styles/mapbox/dark-v10", // your map style
+      drawerTitle: '物业管理区域列表',
+      drawer: false,
+      camera: null,
+      scene: null,
       coordinates: [
         [108.986133,34.275893]
       ],
@@ -538,25 +171,21 @@ export default {
       }
     }
   },
-
   created() {
     // We need to set mapbox-gl library here in order to use it in template
     this.mapbox = Mapbox;
   },
   methods: {
-    mapLoaded(obj) {
-      // console.log(obj.map)
+    async mapLoaded(obj) {
+      // let self = this;
       window.$_map = obj.map;
       this.add3DBuildingLayer(window.$_map);
-      this.addLines(window.$_map);
 
       let satelliteRaster = 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}@2x.webp?access_token=' + this.accessToken;
-      this.addRasterTileLayer(window.$_map, satelliteRaster, 'satellite-raster', 'satellite-raster-layer');
-      window.$_map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
+      
       window.$_map.addControl(mapLanguage);
-      this.addUrbanAreas(window.$_map);
 
-      let geocoder = new MapboxGeocoder({
+      let Geocoder = new MapboxGeocoder({
         accessToken: this.accessToken,
         marker: {
           color: '#ff0011'
@@ -566,47 +195,375 @@ export default {
         mapboxgl: this.mapbox
       });
 
-      let draw = new MapboxDraw();
+      let Draw = new MapboxDraw();
+      
 
-      window.$_map.addControl(geocoder, 'top-left');
+      window.$_map.addControl(Geocoder, 'top-left');
       window.$_map.addControl(new RulerControl(), 'top-right');
       window.$_map.on('ruler.on', () => console.log('ruler: on'));
       window.$_map.on('ruler.off', () => console.log('ruler: off'));
       window.$_map.addControl(new ZoomControl(), 'top-right');
       window.$_map.addControl(new InspectControl(), 'top-right');
-      window.$_map.addControl(draw, 'top-right');
+      window.$_map.addControl(Draw, 'top-right');
+
+      this.addThreeDModel(obj.map, [{
+        obj: './assets/models/radar/34M_17.glb',
+        origin: [108.988133, 34.275893],
+        type: 'gltf',
+        scale: 333,
+        tips: "雷达",
+        units: 'meters',
+        rotation: { x: 90, y: 0, z: 0 }
+      },
+      {
+        obj: './assets/models/landmarks/eiffel.glb',
+        origin: [108.984133, 34.275893],
+        type: 'gltf',
+        scale: 3000,
+        tips: "Eiffel Tower",
+        units: 'meters',
+        rotation: { x: 90, y: 0, z: 0 }
+      }]);
+
+      this.addRasterTileLayer(window.$_map, satelliteRaster, 'satellite-raster', 'satellite-raster-layer');
+      window.$_map.setLayoutProperty('satellite-raster-layer', 'visibility', 'none');
     },
-    addUrbanAreas(map) {
-      let layers = map.getStyle().layers;
-      // Find the index of the first symbol layer in the map style
-      let firstSymbolId;
-      for (let i = 0; i < layers.length; i++) {
-        if (layers[i].type === 'symbol') {
-          firstSymbolId = layers[i].id;
-          break;
+    addThreeDModel(map, options) {
+      window.tb = new Threebox(
+        map,
+        map.getCanvas().getContext('webgl'),
+        {
+          realSunlight: true,
+          sky: false,
+          enableSelectingObjects: true, //change this to false to disable 3D objects selection
+          enableTooltips: true, // change this to false to disable default tooltips on fill-extrusion and 3D models
         }
-      }
-      map.addSource('urban-areas', {
-        'type': 'geojson',
-        'data': 'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_urban_areas.geojson'
-      });
+      );
+
+      let tb = window.tb;
+      let date = new Date();
       map.addLayer({
-        'id': 'urban-areas-fill',
-        'type': 'fill',
-        'source': 'urban-areas',
-        'layout': {},
-        'paint': {
-          'fill-color': '#f08',
-          'fill-opacity': 0.4
+        id: 'threeD-mpdels',
+        type: 'custom',
+        renderingMode: '3d',
+        onAdd: function () {
+          options.map(function(option) {
+            tb.loadObj(option, function (model) {
+              model.setCoords(option.origin);
+              model.setRotation({ x: 0, y: 0, z: 45.7 });
+              model.addTooltip(option.tips, true);
+              model.castShadow = true;
+              tb.add(model);
+            })
+          })
+        },
+
+        render: () => {
+          tb.setSunlight(date, options.origin);
+          tb.update();
         }
-      // This is the important part of this example: the addLayer
-      // method takes 2 arguments: the layer as an object, and a string
-      // representing another layer's name. if the other layer
-      // exists in the stylesheet already, the new layer will be positioned
-      // right before that layer in the stack, making it possible to put
-      // 'overlays' anywhere in the layer stack.
-      // Insert the layer beneath the first symbol layer.
-      }, firstSymbolId);
+      })
+    },
+    drawerOpen() {
+      this.drawCharts('my-echarts', {
+        title: {
+            text: 'ECharts'
+        },
+        tooltip: {},
+        xAxis: {
+            data: ['shirt', 'cardigan', 'chiffon', 'pants', 'heels', 'socks']
+        },
+        yAxis: {},
+        series: [{
+            name: 'sales',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        }]
+      });
+
+      this.drawCharts('my-pie-echarts', {
+          visualMap: {
+              show: false,
+              min: 80,
+              max: 600,
+              inRange: {
+                  colorLightness: [0, 1]
+              }
+          },
+          series : [
+              {
+                  name: '访问来源',
+                  type: 'pie',
+                  radius: '55%',
+                  data:[
+                      {value:235, name:'视频广告'},
+                      {value:274, name:'联盟广告'},
+                      {value:310, name:'邮件营销'},
+                      {value:335, name:'直接访问'},
+                      {value:400, name:'搜索引擎'}
+                  ],
+                  roseType: 'angle',
+                  label: {
+                      normal: {
+                          textStyle: {
+                              color: 'rgba(255, 255, 255, 0.3)'
+                          }
+                      }
+                  },
+                  labelLine: {
+                      normal: {
+                          lineStyle: {
+                              color: 'rgba(255, 255, 255, 0.3)'
+                          }
+                      }
+                  },
+                  itemStyle: {
+                      normal: {
+                          color: '#c23531',
+                          shadowBlur: 200,
+                          shadowColor: 'rgba(0, 0, 0, 0.5)'
+                      }
+                  }
+              }
+          ]
+      });
+
+      this.drawCharts('my-line-echarts', {
+          title: {
+              text: '折线图堆叠'
+          },
+          tooltip: {
+              trigger: 'axis'
+          },
+          legend: {
+              data: ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
+          },
+          grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              containLabel: true
+          },
+          toolbox: {
+              feature: {
+                  saveAsImage: {}
+              }
+          },
+          xAxis: {
+              type: 'category',
+              boundaryGap: false,
+              data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+          },
+          yAxis: {
+              type: 'value'
+          },
+          series: [
+              {
+                  name: '邮件营销',
+                  type: 'line',
+                  stack: '总量',
+                  data: [120, 132, 101, 134, 90, 230, 210]
+              },
+              {
+                  name: '联盟广告',
+                  type: 'line',
+                  stack: '总量',
+                  data: [220, 182, 191, 234, 290, 330, 310]
+              },
+              {
+                  name: '视频广告',
+                  type: 'line',
+                  stack: '总量',
+                  data: [150, 232, 201, 154, 190, 330, 410]
+              },
+              {
+                  name: '直接访问',
+                  type: 'line',
+                  stack: '总量',
+                  data: [320, 332, 301, 334, 390, 330, 320]
+              },
+              {
+                  name: '搜索引擎',
+                  type: 'line',
+                  stack: '总量',
+                  data: [820, 932, 901, 934, 1290, 1330, 1320]
+              }
+          ]
+      });
+
+      this.drawCharts('my-stack-echarts', {
+          color: ['#80FFA5', '#00DDFF', '#37A2FF', '#FF0087', '#FFBF00'],
+          title: {
+              text: '渐变堆叠面积图'
+          },
+          tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                  type: 'cross',
+                  label: {
+                      backgroundColor: '#6a7985'
+                  }
+              }
+          },
+          legend: {
+              data: ['Line 1', 'Line 2', 'Line 3', 'Line 4', 'Line 5']
+          },
+          toolbox: {
+              feature: {
+                  saveAsImage: {}
+              }
+          },
+          grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              containLabel: true
+          },
+          xAxis: [
+              {
+                  type: 'category',
+                  boundaryGap: false,
+                  data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+              }
+          ],
+          yAxis: [
+              {
+                  type: 'value'
+              }
+          ],
+          series: [
+              {
+                  name: 'Line 1',
+                  type: 'line',
+                  stack: '总量',
+                  smooth: true,
+                  lineStyle: {
+                      width: 0
+                  },
+                  showSymbol: false,
+                  areaStyle: {
+                      opacity: 0.8,
+                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                          offset: 0,
+                          color: 'rgba(128, 255, 165)'
+                      }, {
+                          offset: 1,
+                          color: 'rgba(1, 191, 236)'
+                      }])
+                  },
+                  emphasis: {
+                      focus: 'series'
+                  },
+                  data: [140, 232, 101, 264, 90, 340, 250]
+              },
+              {
+                  name: 'Line 2',
+                  type: 'line',
+                  stack: '总量',
+                  smooth: true,
+                  lineStyle: {
+                      width: 0
+                  },
+                  showSymbol: false,
+                  areaStyle: {
+                      opacity: 0.8,
+                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                          offset: 0,
+                          color: 'rgba(0, 221, 255)'
+                      }, {
+                          offset: 1,
+                          color: 'rgba(77, 119, 255)'
+                      }])
+                  },
+                  emphasis: {
+                      focus: 'series'
+                  },
+                  data: [120, 282, 111, 234, 220, 340, 310]
+              },
+              {
+                  name: 'Line 3',
+                  type: 'line',
+                  stack: '总量',
+                  smooth: true,
+                  lineStyle: {
+                      width: 0
+                  },
+                  showSymbol: false,
+                  areaStyle: {
+                      opacity: 0.8,
+                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                          offset: 0,
+                          color: 'rgba(55, 162, 255)'
+                      }, {
+                          offset: 1,
+                          color: 'rgba(116, 21, 219)'
+                      }])
+                  },
+                  emphasis: {
+                      focus: 'series'
+                  },
+                  data: [320, 132, 201, 334, 190, 130, 220]
+              },
+              {
+                  name: 'Line 4',
+                  type: 'line',
+                  stack: '总量',
+                  smooth: true,
+                  lineStyle: {
+                      width: 0
+                  },
+                  showSymbol: false,
+                  areaStyle: {
+                      opacity: 0.8,
+                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                          offset: 0,
+                          color: 'rgba(255, 0, 135)'
+                      }, {
+                          offset: 1,
+                          color: 'rgba(135, 0, 157)'
+                      }])
+                  },
+                  emphasis: {
+                      focus: 'series'
+                  },
+                  data: [220, 402, 231, 134, 190, 230, 120]
+              },
+              {
+                  name: 'Line 5',
+                  type: 'line',
+                  stack: '总量',
+                  smooth: true,
+                  lineStyle: {
+                      width: 0
+                  },
+                  showSymbol: false,
+                  label: {
+                      show: true,
+                      position: 'top'
+                  },
+                  areaStyle: {
+                      opacity: 0.8,
+                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                          offset: 0,
+                          color: 'rgba(255, 191, 0)'
+                      }, {
+                          offset: 1,
+                          color: 'rgba(224, 62, 76)'
+                      }])
+                  },
+                  emphasis: {
+                      focus: 'series'
+                  },
+                  data: [220, 302, 181, 234, 210, 290, 150]
+              }
+          ]
+      })
+    },
+    drawCharts(container, options) {
+      // initialize the echarts instance
+      let myChart = echarts.init(document.getElementById(container), 'dark');
+      // Draw the chart
+      myChart.setOption(options);
     },
     addRasterTileLayer(map, url, sourceId, layerId) {
       map.addSource(sourceId, {
@@ -619,53 +576,6 @@ export default {
         type: "raster",
         source: sourceId
       });
-    },
-    addLines(map) {
-      map.addSource('line', {
-          type: 'geojson',
-          // Line metrics is required to use the 'line-progress' property
-          lineMetrics: true,
-          data: geoJson
-      });
-      map.addLayer({
-          type: 'line',
-          source: 'line',
-          id: 'line',
-          paint: {
-              'line-color': 'rgba(255,0,0,.8)',
-              'line-width': 5
-          },
-          layout: {
-              'line-cap': 'round',
-              'line-join': 'round'
-          }
-      });
-
-      // Add some fog in the background
-      map.setFog({
-          'range': [-0.5, 2.5],
-          'color': 'white',
-          'horizon-blend': 0.2
-      });
-
-      // Add a sky layer over the horizon
-      map.addLayer({
-          'id': 'sky',
-          'type': 'sky',
-          'paint': {
-              'sky-type': 'atmosphere',
-              'sky-atmosphere-color': 'rgba(85, 151, 210, 0.5)'
-          }
-      });
-
-      // Add terrain source, with slight exaggeration
-      map.addSource('mapbox-dem', {
-          'type': 'raster-dem',
-          'url': 'mapbox://mapbox.terrain-rgb',
-          'tileSize': 512,
-          'maxzoom': 14
-      });
-      map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
     },
     add3DBuildingLayer(map) {
       let layers = map.getStyle().layers;
@@ -720,6 +630,41 @@ export default {
 </script>
 
 <style>
+::-webkit-scrollbar {
+    height: 5px;
+    width: 10px;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-button:vertical {
+    display: none
+}
+
+::-webkit-scrollbar-corner:vertical {
+    background-color: #0f0d2a;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-resizer:vertical {
+    background-color: #ff6e00
+}
+
+::-webkit-scrollbar-thumb:vertical {
+    background-color: #8e8e8e
+}
+
+::-webkit-scrollbar-thumb:vertical:hover {
+    background-color: #0099ff
+}
+
+::-webkit-scrollbar-track-piece {
+    background: #ccc
+}
+
+::-webkit-scrollbar-track:vertical {
+    background-color: #000;
+    border-radius: 10px;
+}
 .custom-control {
   pointer-events: auto;
 }
@@ -734,5 +679,17 @@ export default {
 }
 .mapboxgl-ctrl-geocoder--input:focus {
   outline: 0;
+}
+.echarts-box {
+  min-height: 300px;
+}
+.el-drawer.echarts-drawer {
+  background: #0f0d2a !important;
+  height: 100%;
+  overflow: hidden;
+}
+.drawer-content {
+  max-height: calc(100vh - 90px);
+  overflow: auto;
 }
 </style>

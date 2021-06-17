@@ -30,11 +30,21 @@ module.exports = (options = {}) => ({
         use: ['style-loader', 'css-loader', 'postcss-loader']
       },
       {
-        test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+        test: /\.scss$/,
+        use: [{
+          loader: "style-loader" // creates style nodes from JS strings
+        }, {
+          loader: "css-loader" // translates CSS into CommonJS
+        }, {
+          loader: "sass-loader" // compiles Sass to CSS
+        }]
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz|gltf|bin|glb)(\?.+)?$/,
         use: [{
           loader: 'url-loader',
           options: {
-            limit: 10000
+            limit: 1000000000
           }
         }]
       }
@@ -46,7 +56,7 @@ module.exports = (options = {}) => ({
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html'
-    })
+    }),
   ],
   resolve: {
     alias: {
