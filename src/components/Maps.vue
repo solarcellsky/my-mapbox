@@ -83,7 +83,6 @@ export default {
     return {
       accessToken: "pk.eyJ1Ijoic29sYXJjZWxsc2t5IiwiYSI6ImNrbmFmOXVjdjExZ3oycnRhY3ZqNWJqNHcifQ.INN_v0VVzC2KNQVL-nvMLg", // your access token. Needed if you using Mapbox 
       mapStyle: "mapbox://styles/mapbox/dark-v10", // your map style
-      drawerTitle: '物业管理区域列表',
       drawer: false,
       coordinates: [
         [108.986133,34.275893]
