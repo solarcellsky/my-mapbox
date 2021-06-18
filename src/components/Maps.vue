@@ -333,30 +333,29 @@ export default {
 
       let tb = window.tb;
       let date = new Date();
-      options.map(function(option) {
-        map.addLayer({
-          id: option.id + '-model',
-          type: 'custom',
-          renderingMode: '3d',
-          onAdd: function () {
-              tb.loadObj(option, function (model) {
-                model.setCoords(option.origin);
-                model.setRotation({ x: 0, y: 0, z: 80 });
-                model.addTooltip(option.tips, true);
-                model.castShadow = true;
-                tb.add(model);
-                if (model) {
-                  model.addEventListener('SelectedChange', self.onSelectedChange, false);
-                }
-              })
-            
-          },
+      map.addLayer({
+        id: 'custom-3d-models',
+        type: 'custom',
+        renderingMode: '3d',
+        onAdd: function () {
+          options.map(function(option) {
+            tb.loadObj(option, function (model) {
+              model.setCoords(option.origin);
+              model.setRotation({ x: 0, y: 0, z: 80 });
+              model.addTooltip(option.tips, true);
+              model.castShadow = true;
+              tb.add(model);
+              if (model) {
+                model.addEventListener('SelectedChange', self.onSelectedChange, false);
+              }
+            })
+          })
+        },
 
-          render: () => {
-            tb.setSunlight(date, options.origin);
-            tb.update();
-          }
-        })
+        render: () => {
+          tb.setSunlight(date, options.origin);
+          tb.update();
+        }
       })
     },
     onSelectedChange(e) {
