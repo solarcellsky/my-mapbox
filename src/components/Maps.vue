@@ -25,15 +25,9 @@ import SunCalc from 'suncalc';
 import 'threebox-plugin/dist/threebox.css';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-// import { 
-//   RulerControl,
-//   ZoomControl,
-//   InspectControl
-// } from 'mapbox-gl-controls';
-import 'mapbox-gl-controls/lib/controls.css';
-// import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import { ModelGltf } from 'vue-3d-model';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 
 const naviControl = new mapboxgl.NavigationControl();
 const mapLanguage = new window.MapboxLanguage({ defaultLanguage: "zh-Hans" });
@@ -78,6 +72,7 @@ class Custom3DControl {
 }
 
 const custom3DControl = new Custom3DControl();
+const stats = new Stats();
 
 export default {
   name: "Maps",
@@ -120,6 +115,10 @@ export default {
     // this.initMap();
   },
   methods: {
+    animate() {
+      requestAnimationFrame(this.animate);
+      stats.update();
+    },
     initMap() {
       let self = this;
       mapboxgl.accessToken = this.accessToken;
@@ -136,7 +135,6 @@ export default {
         minZoom: 0
       });
 
-      // let Draw = new MapboxDraw();
       let Geocoder = new MapboxGeocoder({
         accessToken: this.accessToken,
         marker: {
@@ -151,14 +149,12 @@ export default {
       map.addControl(custom3DControl, "bottom-right");
       map.addControl(mapLanguage);
       map.addControl(Geocoder, 'top-left');
-      // map.addControl(new RulerControl(), 'top-right');
-      // map.addControl(new ZoomControl(), 'top-right');
-      // map.addControl(new InspectControl(), 'top-right');
-      // map.addControl(Draw, 'top-right');
 
       window.$map = map;
 
       map.on('load', () => {
+        map.getContainer().appendChild(stats.dom);
+        self.animate();
         map.addLayer({
           id: 'sky-layer',
           type: 'sky',
@@ -286,6 +282,19 @@ export default {
           tips: "Elephant",
           units: 'meters',
           rotation: { x: 90, y: 0, z: 0 }
+        },
+        {
+          id: 'seraphine',
+          geojson: '',
+          extrusion: false,
+          sourceId: 'seraphine',
+          obj: './assets/models/seraphine/scene.gltf',
+          origin: [108.981133, 34.266553],
+          type: 'gltf',
+          scale: 150,
+          tips: "Seraphine",
+          units: 'meters',
+          rotation: { x: 90, y: 0, z: 0 }
         }]);
       })
 
@@ -339,7 +348,6 @@ export default {
                 tb.add(model);
                 if (model) {
                   model.addEventListener('SelectedChange', self.onSelectedChange, false);
-                  model.addEventListener('Wireframed', self.onWireframed, false);
                 }
               })
             
@@ -353,18 +361,12 @@ export default {
       })
     },
     onSelectedChange(e) {
-      let selected = e.detail.selected;
+      // let selected = e.detail.selected;
       this.object = e.detail.userData;
-      console.log("onSelectedChange: " + selected, e.detail.userData);
-      // e.detail.wireframe = true;
       // window.$map.repaint = true;
       this.drawer = true;
       // this.$message.info("Press 'Shift' to drag or ress 'Alt' to rotate")
-    },
-    onWireframed(e) {
-      console.log("onWireframed: " + e.detail.wireframe);
       window.tb.update();
-      // window.$map.repaint = true;
     },
     createExtrusionLayer(map, geojson, sourceId, layerId) {
       map.addSource(sourceId, {
