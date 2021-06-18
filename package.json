@@ -24,6 +24,7 @@
     "node-sass": "^4.12.0",
     "sass-loader": "^7.0.1",
     "style-loader": "^2.0.0",
+    "suncalc": "^1.8.0",
     "three": "^0.129.0",
     "threebox-plugin": "^2.2.4",
     "vue": "^2.6.11",
